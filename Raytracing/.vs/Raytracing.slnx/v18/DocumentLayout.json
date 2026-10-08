@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "G:\\st20300362\\Generating Virtual Worlds\\Raytracing\\GDV6001-st20300362-Raytracing\\Raytracing\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{47CC07A1-2FD2-49B7-A482-60F6C00B263D}|Raytracing\\Raytracing.vcxproj|G:\\st20300362\\Generating Virtual Worlds\\Raytracing\\GDV6001-st20300362-Raytracing\\Raytracing\\Raytracing\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{47CC07A1-2FD2-49B7-A482-60F6C00B263D}|Raytracing\\Raytracing.vcxproj|solutionrelative:Raytracing\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "G:\\st20300362\\Generating Virtual Worlds\\Raytracing\\GDV6001-st20300362-Raytracing\\Raytracing\\Raytracing\\main.cpp",
+              "RelativeDocumentMoniker": "Raytracing\\main.cpp",
+              "ToolTip": "G:\\st20300362\\Generating Virtual Worlds\\Raytracing\\GDV6001-st20300362-Raytracing\\Raytracing\\Raytracing\\main.cpp",
+              "RelativeToolTip": "Raytracing\\main.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-10-08T08:11:38.299Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
