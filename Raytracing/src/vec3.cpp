@@ -62,3 +62,23 @@ double vec3::length_squared() const
 {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
 }
+
+double vec3::random_double() {
+    // Returns a random real in [0,1).
+    return std::rand() / (RAND_MAX + 1.0);
+}
+
+double vec3::random_double(double min, double max) {
+    // Returns a random real in [min,max).
+    return min + (max - min) * random_double();
+}
+
+vec3 vec3::random() 
+{
+    return vec3(random_double(), random_double(), random_double());
+}
+
+vec3 vec3::random(double min, double max) 
+{
+    return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+}

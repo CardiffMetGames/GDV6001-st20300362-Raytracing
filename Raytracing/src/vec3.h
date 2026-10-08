@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <random>
 
 class vec3
 {
@@ -29,6 +30,15 @@ public:
 
 	double length() const;
 	double length_squared() const;
+
+	static vec3 random();
+
+	static vec3 random(double min, double max);
+
+private:
+	static double random_double();
+
+	static double random_double(double min, double max);
 };
 
 using point3 = vec3;
@@ -84,5 +94,20 @@ inline vec3 unit_vector(const vec3& v)
 {
 	return v / v.length();
 }
+
+inline vec3 random_unit_vector() 
+{
+	while (true) 
+	{
+		auto p = vec3::random(-1, 1);
+		auto lensq = p.length_squared();
+
+		if (1e-160 < lensq && lensq <= 1)
+		{
+			return p / sqrt(lensq);
+		}
+	}
+}
+
 
 #endif
