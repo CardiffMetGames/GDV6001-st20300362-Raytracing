@@ -20,6 +20,12 @@ set ( SOURCE_RAYTRACER
   src/colour.h
   src/ray.h
   src/ray.cpp
+  src/hittable.h
+  src/sphere.h
+  src/sphere.cpp
+  src/hittable_list.h
+  src/hittable_list.cpp
+  src/common.h
 )
 
 include_directories(src)
