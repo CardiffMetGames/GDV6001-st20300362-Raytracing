@@ -26,6 +26,10 @@ set ( SOURCE_RAYTRACER
   src/hittable_list.h
   src/hittable_list.cpp
   src/common.h
+  src/interval.h
+  src/interval.cpp
+  src/camera.h
+  src/camera.cpp
 )
 
 include_directories(src)
