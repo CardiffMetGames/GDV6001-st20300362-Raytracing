@@ -3,6 +3,7 @@
 
 #include "hittable.h"
 #include "common.h"
+#include "material.h"
 
 class camera 
 {

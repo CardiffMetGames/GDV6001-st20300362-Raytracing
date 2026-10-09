@@ -30,6 +30,8 @@ set ( SOURCE_RAYTRACER
   src/interval.cpp
   src/camera.h
   src/camera.cpp
+  src/material.h
+  src/material.cpp
 )
 
 include_directories(src)
