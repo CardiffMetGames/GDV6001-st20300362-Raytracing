@@ -37,6 +37,8 @@ public:
 
 	static vec3 random(double min, double max);
 
+	static vec3 random_in_unit_disk();
+
 private:
 	static double random_double();
 
