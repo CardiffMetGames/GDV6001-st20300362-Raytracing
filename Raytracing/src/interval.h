@@ -12,6 +12,9 @@ public:
 
     interval(double min, double max) : min(min), max(max) {}
 
+    interval(const interval& a, const interval& b);
+
+
     double size() const;
 
     bool contains(double x) const;
@@ -19,6 +22,8 @@ public:
     bool surrounds(double x) const;
 
     double clamp(double x) const;
+
+    interval expand(double delta) const;
 
     static const interval empty, universe;
 };

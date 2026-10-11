@@ -1,6 +1,7 @@
 #ifndef HITTABLE_LIST_H
 #define HITTABLE_LIST_H
 
+#include "aabb.h"
 #include "hittable.h"
 
 #include <memory>
@@ -21,6 +22,11 @@ public:
     void add(shared_ptr<hittable> object);
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
+
+    aabb bounding_box() const override;
+
+private:
+    aabb bbox;
 };
 
 #endif

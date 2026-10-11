@@ -22,6 +22,7 @@ set ( SOURCE_RAYTRACER
   src/ray.h
   src/ray.cpp
   src/hittable.h
+  src/hittable.cpp
   src/sphere.h
   src/sphere.cpp
   src/hittable_list.h
@@ -33,6 +34,10 @@ set ( SOURCE_RAYTRACER
   src/camera.cpp
   src/material.h
   src/material.cpp
+  src/aabb.h
+  src/aabb.cpp
+  src/bvh.h
+  src/bvh.cpp
 )
 
 include_directories(src)

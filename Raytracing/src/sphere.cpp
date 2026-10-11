@@ -33,3 +33,8 @@ bool sphere::hit(const ray& r, interval ray_t, hit_record& rec) const
 
     return true;
 }
+
+aabb sphere::bounding_box() const
+{
+    return bbox;
+}
