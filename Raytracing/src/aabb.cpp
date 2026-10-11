@@ -1,5 +1,8 @@
 #include "aabb.h"
 
+const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
+const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
+
 aabb::aabb(const point3& a, const point3& b)
 {
     // Treat the two points a and b as extrema for the bounding box, so we don't require a
@@ -63,4 +66,18 @@ bool aabb::hit(const ray& r, interval ray_t) const
     }
 
     return true;
+}
+
+int aabb::longest_axis() const
+{
+    // Returns the index of the longest axis of the bounding box.
+
+    if (x.size() > y.size())
+    {
+        return x.size() > z.size() ? 0 : 2;
+    }
+    else
+    {
+        return y.size() > z.size() ? 1 : 2;
+    }
 }

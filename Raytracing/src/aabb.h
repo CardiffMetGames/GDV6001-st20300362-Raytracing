@@ -21,6 +21,11 @@ public:
     const interval& axis_interval(int n) const;
 
     bool hit(const ray& r, interval ray_t) const;
+
+    int longest_axis() const;
+
+    static const aabb empty, universe;
 };
+
 
 #endif

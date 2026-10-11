@@ -3,6 +3,7 @@
 
 #include "hittable.h"
 #include "common.h"
+#include "texture.h"
 
 class material 
 {
@@ -15,12 +16,13 @@ public:
 class lambertian : public material 
 {
 public:
-    lambertian(const colour& albedo) : albedo(albedo) {}
+    lambertian(const colour& albedo) : tex(make_shared<solid_color>(albedo)) {}
+    lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, colour& attenuation, ray& scattered) const override;
 
 private:
-    colour albedo;
+    shared_ptr<texture> tex;
 };
 
 class metal : public material 

@@ -38,6 +38,8 @@ set ( SOURCE_RAYTRACER
   src/aabb.cpp
   src/bvh.h
   src/bvh.cpp
+  src/texture.h
+  src/texture.cpp
 )
 
 include_directories(src)
