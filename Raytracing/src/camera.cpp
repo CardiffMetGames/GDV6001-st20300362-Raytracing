@@ -1,26 +1,125 @@
 #include "camera.h"
 
-void camera::render(const hittable& world)
+#include <vector>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include <cmath>
+#include "colour.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "external\stb_image_write.h"
+
+void camera::render(const hittable& world, const std::string& format, const std::string& filename)
 {
     initialize();
 
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    std::string fmt = format;
+    for (auto &c : fmt) c = static_cast<char>(std::tolower(c));
 
-    for (int j = 0; j < image_height; j++) 
-    {
-        std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
-        
-        for (int i = 0; i < image_width; i++) 
+    if (fmt == "png") {
+        std::vector<unsigned char> image;
+        image.resize(image_width * image_height * 3);
+
+        for (int j = 0; j < image_height; j++)
         {
-            colour pixel_color(0, 0, 0);
+            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
 
-            for (int sample = 0; sample < samples_per_pixel; sample++) 
+            for (int i = 0; i < image_width; i++)
             {
-                ray r = get_ray(i, j);
-                pixel_color += ray_colour(r, max_depth, world);
+                colour pixel_color(0, 0, 0);
+
+                for (int sample = 0; sample < samples_per_pixel; sample++)
+                {
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_colour(r, max_depth, world);
+                }
+
+                auto gamma_correct = [](double v) 
+                {
+                    if (v <= 0.0)
+                    {
+                         return 0.0;
+                    }
+
+                    return std::sqrt(v);
+                };
+
+                auto clamp_intensity = [](double v) -> double 
+                {
+                    if (v < 0.0)
+                    {
+                        return 0.0;
+                    }
+
+                    if (v > 0.999)
+                    {
+                        return 0.999;
+                    }
+
+                    return v;
+                };
+
+                double r = pixel_samples_scale * pixel_color.x();
+                double g = pixel_samples_scale * pixel_color.y();
+                double b = pixel_samples_scale * pixel_color.z();
+
+                r = gamma_correct(r);
+                g = gamma_correct(g);
+                b = gamma_correct(b);
+
+                int rbyte = static_cast<int>(256 * clamp_intensity(r));
+                int gbyte = static_cast<int>(256 * clamp_intensity(g));
+                int bbyte = static_cast<int>(256 * clamp_intensity(b));
+
+                int index = (j * image_width + i) * 3;
+                image[index + 0] = static_cast<unsigned char>(rbyte);
+                image[index + 1] = static_cast<unsigned char>(gbyte);
+                image[index + 2] = static_cast<unsigned char>(bbyte);
             }
-            write_colour(std::cout, pixel_samples_scale * pixel_color);
         }
+
+        // PNG
+        if (!stbi_write_png(filename.c_str(), image_width, image_height, 3, image.data(), image_width * 3))
+        {
+            std::cerr << "Failed to write PNG file\n";
+        }
+        else
+        {
+            std::clog << "\nWrote " << filename << '\n';
+        }
+    }
+    else {
+        // PMM
+        std::ofstream out(filename, std::ios::out | std::ios::binary);
+        if (!out)
+        {
+            std::cerr << "Failed to open output file for PPM\n";
+            return;
+        }
+
+        out << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+        for (int j = 0; j < image_height; j++)
+        {
+            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+
+            for (int i = 0; i < image_width; i++)
+            {
+                colour pixel_color(0, 0, 0);
+
+                for (int sample = 0; sample < samples_per_pixel; sample++)
+                {
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_colour(r, max_depth, world);
+                }
+
+                write_colour(out, pixel_samples_scale * pixel_color);
+            }
+        }
+
+        out.close();
+        std::clog << "\nWrote " << filename << '\n';
     }
 }
 
