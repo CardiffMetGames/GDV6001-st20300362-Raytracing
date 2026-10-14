@@ -28,6 +28,7 @@ set ( SOURCE_RAYTRACER
   src/hittable_list.h
   src/hittable_list.cpp
   src/common.h
+  src/frame_time.cpp
   src/interval.h
   src/interval.cpp
   src/camera.h

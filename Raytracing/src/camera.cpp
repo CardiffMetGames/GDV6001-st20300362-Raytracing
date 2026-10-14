@@ -188,6 +188,9 @@ colour camera::ray_colour(const ray& r, int depth, const hittable& world) const
     return (1.0 - a) * colour(1.0, 1.0, 1.0) + a * colour(0.5, 0.7, 1.0);
 }
 
+// Global frame time variable
+extern double g_frame_time; 
+
 ray camera::get_ray(int i, int j) const 
 {
     // Construct a camera ray originating from the origin and directed at randomly sampled
@@ -200,7 +203,7 @@ ray camera::get_ray(int i, int j) const
 
     auto ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();
     auto ray_direction = pixel_sample - ray_origin;
-    auto ray_time = random_double();
+    auto ray_time = g_frame_time;
 
     return ray(ray_origin, ray_direction, ray_time);
 
