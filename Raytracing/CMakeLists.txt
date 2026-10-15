@@ -43,6 +43,10 @@ set ( SOURCE_RAYTRACER
   src/texture.cpp
   src/rtw_stb_image.h
   src/stb_image_impl.cpp
+  src/perlin.h
+  src/perlin.cpp
+  src/quad.h
+  src/quad.cpp
 )
 
 include_directories(src)

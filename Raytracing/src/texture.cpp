@@ -32,3 +32,8 @@ colour checker_texture::value(double u, double v, const point3& p) const
 
     return isEven ? even->value(u, v, p) : odd->value(u, v, p);
 }
+
+colour noise_texture::value(double u, double v, const point3& p) const
+{
+    return colour(.5, .5, .5) * (1 + std::sin(scale * p.z() + 10 * noise.turb(p, 7)));
+}

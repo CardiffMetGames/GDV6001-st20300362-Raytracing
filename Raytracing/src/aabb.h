@@ -12,7 +12,10 @@ public:
 
     aabb() {} // The default AABB is empty, since intervals are empty by default.
 
-    aabb(const interval& x, const interval& y, const interval& z) : x(x), y(y), z(z) {}
+    aabb(const interval& x, const interval& y, const interval& z) : x(x), y(y), z(z)
+    {
+        pad_to_minimums();
+    }
 
     aabb(const point3& a, const point3& b);
 
@@ -25,6 +28,8 @@ public:
     int longest_axis() const;
 
     static const aabb empty, universe;
+
+    void pad_to_minimums();
 };
 
 
