@@ -1,5 +1,10 @@
 #include "material.h"
 
+colour material::emitted(double u, double v, const point3& p) const 
+{
+    return colour(0, 0, 0);
+}
+
 bool material::scatter(const ray& r_in, const hit_record& rec, colour& attenuation, ray& scattered) const
 {
     return false;
@@ -56,4 +61,9 @@ double dielectric::reflectance(double cosine, double refraction_index)
     auto r0 = (1 - refraction_index) / (1 + refraction_index);
     r0 = r0 * r0;
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
+}
+
+colour diffuse_light::emitted(double u, double v, const point3& p) const
+{
+    return tex->value(u, v, p);
 }

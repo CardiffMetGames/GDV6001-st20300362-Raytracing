@@ -5,18 +5,22 @@
 #include "common.h"
 #include "texture.h"
 
+#include <algorithm>
+
 class material 
 {
 public:
     virtual ~material() = default;
 
     virtual bool scatter(const ray& r_in, const hit_record& rec, colour& attenuation, ray& scattered) const;
+
+    virtual colour emitted(double u, double v, const point3& p) const;
 };
 
 class lambertian : public material 
 {
 public:
-    lambertian(const colour& albedo) : tex(make_shared<solid_color>(albedo)) {}
+    lambertian(const colour& albedo) : tex(make_shared<solid_colour>(albedo)) {}
     lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, colour& attenuation, ray& scattered) const override;
@@ -50,6 +54,18 @@ private:
     double refraction_index;
 
     static double reflectance(double cosine, double refraction_index);
+};
+
+class diffuse_light : public material 
+{
+public:
+    diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
+    diffuse_light(const colour& emit) : tex(make_shared<solid_colour>(emit)) {}
+
+    colour emitted(double u, double v, const point3& p) const override;
+
+private:
+    shared_ptr<texture> tex;
 };
 
 #endif

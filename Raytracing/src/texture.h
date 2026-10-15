@@ -15,12 +15,12 @@ public:
 
 };
 
-class solid_color : public texture 
+class solid_colour : public texture 
 {
 public:
-    solid_color(const colour& albedo) : albedo(albedo) {}
+    solid_colour(const colour& albedo) : albedo(albedo) {}
 
-    solid_color(double red, double green, double blue) : solid_color(colour(red, green, blue)) {}
+    solid_colour(double red, double green, double blue) : solid_colour(colour(red, green, blue)) {}
 
     colour value(double u, double v, const point3& p) const override;
 
@@ -32,7 +32,7 @@ class checker_texture : public texture {
 public:
     checker_texture(double scale, shared_ptr<texture> even, shared_ptr<texture> odd) : inv_scale(1.0 / scale), even(even), odd(odd) {}
 
-    checker_texture(double scale, const colour& c1, const colour& c2) : checker_texture(scale, make_shared<solid_color>(c1), make_shared<solid_color>(c2)) {}
+    checker_texture(double scale, const colour& c1, const colour& c2) : checker_texture(scale, make_shared<solid_colour>(c1), make_shared<solid_colour>(c2)) {}
 
     colour value(double u, double v, const point3& p) const override;
 

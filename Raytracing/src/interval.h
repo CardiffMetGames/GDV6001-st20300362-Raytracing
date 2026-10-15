@@ -26,6 +26,18 @@ public:
     interval expand(double delta) const;
 
     static const interval empty, universe;
+    
+
+    friend interval operator+(const interval& ival, double displacement)
+    {
+        return interval(ival.min + displacement, ival.max + displacement);
+    }
+
+    friend interval operator+(double displacement, const interval& ival)
+    {
+        return ival + displacement;
+    }
 };
+
 
 #endif

@@ -27,12 +27,12 @@ void camera::render(const hittable& world, const std::string& format, const std:
 
             for (int i = 0; i < image_width; i++)
             {
-                colour pixel_color(0, 0, 0);
+                colour pixel_colour(0, 0, 0);
 
                 for (int sample = 0; sample < samples_per_pixel; sample++)
                 {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_colour(r, max_depth, world);
+                    pixel_colour += ray_colour(r, max_depth, world);
                 }
 
                 auto gamma_correct = [](double v) 
@@ -60,9 +60,9 @@ void camera::render(const hittable& world, const std::string& format, const std:
                     return v;
                 };
 
-                double r = pixel_samples_scale * pixel_color.x();
-                double g = pixel_samples_scale * pixel_color.y();
-                double b = pixel_samples_scale * pixel_color.z();
+                double r = pixel_samples_scale * pixel_colour.x();
+                double g = pixel_samples_scale * pixel_colour.y();
+                double b = pixel_samples_scale * pixel_colour.z();
 
                 r = gamma_correct(r);
                 g = gamma_correct(g);
@@ -106,15 +106,15 @@ void camera::render(const hittable& world, const std::string& format, const std:
 
             for (int i = 0; i < image_width; i++)
             {
-                colour pixel_color(0, 0, 0);
+                colour pixel_colour(0, 0, 0);
 
                 for (int sample = 0; sample < samples_per_pixel; sample++)
                 {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_colour(r, max_depth, world);
+                    pixel_colour += ray_colour(r, max_depth, world);
                 }
 
-                write_colour(out, pixel_samples_scale * pixel_color);
+                write_colour(out, pixel_samples_scale * pixel_colour);
             }
         }
 
@@ -171,21 +171,24 @@ colour camera::ray_colour(const ray& r, int depth, const hittable& world) const
 
     hit_record rec;
 
-    if (world.hit(r, interval(0.001, infinity), rec))
+    // If the ray hits nothing, return the background colour.
+    if (!world.hit(r, interval(0.001, infinity), rec))
     {
-        ray scattered;
-        colour attenuation;
-        if (rec.mat->scatter(r, rec, attenuation, scattered))
-        {
-            return attenuation * ray_colour(scattered, depth - 1, world);
-        }
-          
-        return colour(0, 0, 0);
+        return background;
     }
 
-    vec3 unit_direction = unit_vector(r.direction());
-    auto a = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - a) * colour(1.0, 1.0, 1.0) + a * colour(0.5, 0.7, 1.0);
+    ray scattered;
+    colour attenuation;
+    colour colour_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+
+    if (!rec.mat->scatter(r, rec, attenuation, scattered))
+    {
+        return colour_from_emission;
+    }
+
+    colour colour_from_scatter = attenuation * ray_colour(scattered, depth - 1, world);
+
+    return colour_from_emission + colour_from_scatter;
 }
 
 // Global frame time variable
