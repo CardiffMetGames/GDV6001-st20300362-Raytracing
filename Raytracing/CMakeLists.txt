@@ -47,6 +47,8 @@ set ( SOURCE_RAYTRACER
   src/perlin.cpp
   src/quad.h
   src/quad.cpp
+  src/triangle.h
+  src/triangle.cpp
 )
 
 include_directories(src)

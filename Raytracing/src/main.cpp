@@ -8,6 +8,7 @@
 #include "material.h"
 #include "texture.h"
 #include "quad.h"
+#include "triangle.h"
 
 #include <string>
 #include <iostream>
@@ -301,11 +302,9 @@ void simple_light() {
 
     auto pertext = make_shared<noise_texture>(4);
     world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
-    world.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
 
     auto difflight = make_shared<diffuse_light>(colour(4, 4, 4));
-    world.add(make_shared<sphere>(point3(0, 7, 0), 2, difflight));
-    world.add(make_shared<quad>(point3(3, 1, -2), vec3(2, 0, 0), vec3(0, 2, 0), difflight));
+    world.add(make_shared<triangle>(point3(0, 0, 0), vec3(1, 5, 1), vec3(0, 0, 1), difflight));
 
     camera cam;
 
@@ -354,8 +353,8 @@ void cornell_box()
     camera cam;
 
     cam.aspect_ratio = 1.0;
-    cam.image_width = 1200;
-    cam.samples_per_pixel = 1000;
+    cam.image_width = 600;
+    cam.samples_per_pixel = 100;
     cam.max_depth = 50;
     cam.background = colour(0, 0, 0);
 
@@ -369,9 +368,10 @@ void cornell_box()
     render(cam, world);
 }
 
+
 int main()
 {
-    switch (7) 
+    switch (6) 
     {
     case 1:  bouncing_spheres();  break;
     case 2:  checkered_spheres(); break;
