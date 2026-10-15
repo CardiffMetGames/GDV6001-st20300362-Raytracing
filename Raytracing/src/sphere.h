@@ -32,6 +32,8 @@ private:
     double radius;
     shared_ptr<material> mat;
     aabb bbox;
+
+    static void get_sphere_uv(const point3& p, double& u, double& v);
 };
 
 #endif

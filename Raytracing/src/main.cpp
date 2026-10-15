@@ -12,7 +12,104 @@
 #include <iostream>
 #include <cstdlib>
 
-int main()
+void render(camera cam, hittable_list world)
+{
+    // Prompt for PNG or PPM
+    std::string format;
+    std::cout << "Choose output format ('png' or 'ppm') [png]: ";
+    std::getline(std::cin, format);
+    if (format.empty()) format = "png";
+    for (auto& c : format) c = static_cast<char>(std::tolower(c));
+
+    // Prompt for filename
+    std::string filename;
+    std::string default_name = (format == "ppm") ? "output.ppm" : "output.png";
+    std::cout << "Enter filename [" << default_name << "]: ";
+    std::getline(std::cin, filename);
+    if (filename.empty()) filename = default_name;
+
+    {
+        auto pos = filename.find_last_of('.');
+        if (pos == std::string::npos) {
+            filename += "." + format;
+        }
+        else {
+            std::string current_ext = filename.substr(pos + 1);
+            for (auto& c : current_ext) c = static_cast<char>(std::tolower(c));
+            if (current_ext != format) {
+                filename = filename.substr(0, pos) + "." + format;
+            }
+        }
+    }
+
+    // Prompt for number of frames
+    std::cout << "Number of frames to render [1]: ";
+    std::string frames_str;
+    std::getline(std::cin, frames_str);
+    int frames = 1;
+    if (!frames_str.empty())
+    {
+        try
+        {
+            frames = std::stoi(frames_str);
+            if (frames < 1) frames = 1;
+        }
+        catch (...) { frames = 1; }
+    }
+
+    // Prompt for FPS
+    std::cout << "Output frames per second (FPS) [30]: ";
+    std::string fps_str;
+    std::getline(std::cin, fps_str);
+    double fps = 30.0;
+    if (!fps_str.empty())
+    {
+        try
+        {
+            fps = std::stod(fps_str);
+            if (fps <= 0.0) fps = 30.0;
+        }
+        catch (...) { fps = 30.0; }
+    }
+
+    if (frames <= 1) {
+        // Single frame uses random time
+        g_frame_time = random_double();
+        cam.render(world, format, filename);
+
+        // Open output when finished
+        std::string cmd;
+#ifdef _WIN32
+        cmd = "start \"\" \"" + filename + "\"";
+#endif
+        std::system(cmd.c_str());
+    }
+    else
+    {
+        std::string base = filename;
+        std::string ext = format;
+
+        for (int f = 0; f < frames; ++f)
+        {
+            double frame_time_sec = static_cast<double>(f) / fps;
+
+            double tnorm = (frames == 1) ? 0.0 : static_cast<double>(f) / static_cast<double>(frames - 1);
+
+            double t_pingpong = (tnorm <= 0.5) ? (tnorm * 2.0) : (2.0 - tnorm * 2.0);
+
+            g_frame_time = t_pingpong;
+
+            char buf[512];
+            std::snprintf(buf, sizeof(buf), "%s_%04d.%s", base.c_str(), f, ext.c_str());
+            std::string outname(buf);
+
+            std::cout << "Rendering frame " << f << " / " << (frames - 1) << "  (time=" << frame_time_sec << "s, norm=" << t_pingpong << ")\n";
+            cam.render(world, format, outname);
+        }
+    }
+}
+
+void bouncing_spheres()
 {
     hittable_list world;
 
@@ -79,97 +176,63 @@ int main()
     cam.defocus_angle = 0.6;
     cam.focus_dist = 10.0;
 
-    // Prompt for PNG or PPM
-    std::string format;
-    std::cout << "Choose output format ('png' or 'ppm') [png]: ";
-    std::getline(std::cin, format);
-    if (format.empty()) format = "png";
-    for (auto &c : format) c = static_cast<char>(std::tolower(c));
+    render(cam, world);
+}
 
-    // Prompt for filename
-    std::string filename;
-    std::string default_name = (format == "ppm") ? "output.ppm" : "output.png";
-    std::cout << "Enter filename [" << default_name << "]: ";
-    std::getline(std::cin, filename);
-    if (filename.empty()) filename = default_name;
+void checkered_spheres() {
+    hittable_list world;
 
+    auto checker = make_shared<checker_texture>(0.32, colour(.2, .3, .1), colour(.9, .9, .9));
+
+    world.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<lambertian>(checker)));
+    world.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<lambertian>(checker)));
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.vfov = 20;
+    cam.lookfrom = point3(13, 2, 3);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    render(cam, world);
+}
+
+void earth() {
+    auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+    auto earth_surface = make_shared<lambertian>(earth_texture);
+    auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.vfov = 20;
+    cam.lookfrom = point3(0, 0, 12);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    render(cam, hittable_list(globe));
+}
+
+int main()
+{
+    switch (3) 
     {
-        auto pos = filename.find_last_of('.');
-        if (pos == std::string::npos) {
-            filename += "." + format;
-        } else {
-            std::string current_ext = filename.substr(pos + 1);
-            for (auto &c : current_ext) c = static_cast<char>(std::tolower(c));
-            if (current_ext != format) {
-                filename = filename.substr(0, pos) + "." + format;
-            }
-        }
-    }
-
-    // Prompt for number of frames
-    std::cout << "Number of frames to render [1]: ";
-    std::string frames_str;
-    std::getline(std::cin, frames_str);
-    int frames = 1;
-    if (!frames_str.empty()) 
-    {
-        try 
-        {
-            frames = std::stoi(frames_str);
-            if (frames < 1) frames = 1;
-        }
-        catch (...) { frames = 1; }
-    }
-
-    // Prompt for FPS
-    std::cout << "Output frames per second (FPS) [30]: ";
-    std::string fps_str;
-    std::getline(std::cin, fps_str);
-    double fps = 30.0;
-    if (!fps_str.empty()) 
-    {
-        try 
-        {
-            fps = std::stod(fps_str);
-            if (fps <= 0.0) fps = 30.0;
-        }
-        catch (...) { fps = 30.0; }
-    }
-
-    if (frames <= 1) {
-        // Single frame uses random time
-        g_frame_time = random_double();
-        cam.render(world, format, filename);
-
-        // Open output when finished
-        std::string cmd;
-#ifdef _WIN32
-        cmd = "start \"\" \"" + filename + "\"";
-#endif
-        std::system(cmd.c_str());
-    }
-    else 
-    {
-        std::string base = filename;
-        std::string ext = format;
-
-        for (int f = 0; f < frames; ++f) 
-        {
-            double frame_time_sec = static_cast<double>(f) / fps;
-
-            double tnorm = (frames == 1) ? 0.0 : static_cast<double>(f) / static_cast<double>(frames - 1);
-
-            double t_pingpong = (tnorm <= 0.5) ? (tnorm * 2.0) : (2.0 - tnorm * 2.0);
-
-            g_frame_time = t_pingpong;
-
-            char buf[512];
-            std::snprintf(buf, sizeof(buf), "%s_%04d.%s", base.c_str(), f, ext.c_str());
-            std::string outname(buf);
-
-            std::cout << "Rendering frame " << f << " / " << (frames - 1) << "  (time=" << frame_time_sec << "s, norm=" << t_pingpong << ")\n";
-            cam.render(world, format, outname);
-        }
+    case 1:  bouncing_spheres();  break;
+    case 2:  checkered_spheres(); break;
+    case 3:  earth();             break;
     }
 
     return 0;
