@@ -58,7 +58,7 @@ bool triangle::is_interior(double a, double b, hit_record& rec) const
     // Given the hit point in plane coordinates, return false if it is outside the
     // primitive, otherwise set the hit record UV coordinates and return true.
 
-    if (!(a > 0 && b > 0 && a + b < 1))
+    if (!((a < 0 || b > 1) && (a < 0 || a + b > 1)))
     {
         return false;
     }

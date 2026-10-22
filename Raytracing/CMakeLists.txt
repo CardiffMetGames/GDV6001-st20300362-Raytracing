@@ -49,6 +49,8 @@ set ( SOURCE_RAYTRACER
   src/quad.cpp
   src/triangle.h
   src/triangle.cpp
+  src/constant_medium.h
+  src/constant_medium.cpp
 )
 
 include_directories(src)

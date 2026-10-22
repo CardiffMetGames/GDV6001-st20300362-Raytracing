@@ -9,6 +9,7 @@
 #include "texture.h"
 #include "quad.h"
 #include "triangle.h"
+#include "constant_medium.h"
 
 #include <string>
 #include <iostream>
@@ -304,7 +305,7 @@ void simple_light() {
     world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
 
     auto difflight = make_shared<diffuse_light>(colour(4, 4, 4));
-    world.add(make_shared<triangle>(point3(0, 0, 0), vec3(1, 5, 1), vec3(0, 0, 1), difflight));
+    world.add(make_shared<triangle>(point3(3, 1, -2), vec3(2, 0, 0), vec3(0, 1, 0), difflight));
 
     camera cam;
 
@@ -332,6 +333,8 @@ void cornell_box()
     auto white = make_shared<lambertian>(colour(.73, .73, .73));
     auto green = make_shared<lambertian>(colour(.12, .45, .15));
     auto light = make_shared<diffuse_light>(colour(15, 15, 15));
+    auto glass = make_shared<dielectric>(1.5);
+    auto water = make_shared<dielectric>(1.3);
 
     world.add(make_shared<quad>(point3(555, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), green));
     world.add(make_shared<quad>(point3(0, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), red));
@@ -340,10 +343,15 @@ void cornell_box()
     world.add(make_shared<quad>(point3(555, 555, 555), vec3(-555, 0, 0), vec3(0, 0, -555), white));
     world.add(make_shared<quad>(point3(0, 0, 555), vec3(555, 0, 0), vec3(0, 555, 0), white));
 
-    shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+    shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), glass);
     box1 = make_shared<rotate_y>(box1, 15);
     box1 = make_shared<translate>(box1, vec3(265, 0, 295));
     world.add(box1);
+
+    shared_ptr<hittable> box3 = box(point3(0, 0, 0), point3(145, 310, 145), water);
+    box3 = make_shared<rotate_y>(box3, 15);
+    box3 = make_shared<translate>(box3, vec3(265, 20, 295));
+    world.add(box3);
 
     shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
     box2 = make_shared<rotate_y>(box2, -18);
@@ -354,7 +362,7 @@ void cornell_box()
 
     cam.aspect_ratio = 1.0;
     cam.image_width = 600;
-    cam.samples_per_pixel = 100;
+    cam.samples_per_pixel = 500;
     cam.max_depth = 50;
     cam.background = colour(0, 0, 0);
 
@@ -368,10 +376,54 @@ void cornell_box()
     render(cam, world);
 }
 
+void cornell_smoke() 
+{
+    hittable_list world;
+
+    auto red = make_shared<lambertian>(colour(.65, .05, .05));
+    auto white = make_shared<lambertian>(colour(.73, .73, .73));
+    auto green = make_shared<lambertian>(colour(.12, .45, .15));
+    auto light = make_shared<diffuse_light>(colour(7, 7, 7));
+
+    world.add(make_shared<quad>(point3(555, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), green));
+    world.add(make_shared<quad>(point3(0, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), red));
+    world.add(make_shared<quad>(point3(113, 554, 127), vec3(330, 0, 0), vec3(0, 0, 305), light));
+    world.add(make_shared<quad>(point3(0, 555, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    world.add(make_shared<quad>(point3(0, 0, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    world.add(make_shared<quad>(point3(0, 0, 555), vec3(555, 0, 0), vec3(0, 555, 0), white));
+
+    shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+
+    shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
+    box2 = make_shared<rotate_y>(box2, -18);
+    box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+
+    world.add(make_shared<constant_medium>(box1, 0.01, colour(0, 0, 0)));
+    world.add(make_shared<constant_medium>(box2, 0.01, colour(1, 1, 1)));
+
+    camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 600;
+    cam.samples_per_pixel = 200;
+    cam.max_depth = 50;
+    cam.background = colour(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.lookfrom = point3(278, 278, -800);
+    cam.lookat = point3(278, 278, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    render(cam, world);
+}
 
 int main()
 {
-    switch (6) 
+    switch (7) 
     {
     case 1:  bouncing_spheres();  break;
     case 2:  checkered_spheres(); break;
@@ -380,6 +432,7 @@ int main()
     case 5: quads(); break;
     case 6: simple_light(); break;
     case 7: cornell_box(); break;
+    case 8:  cornell_smoke(); break;
     }
 
     return 0;
