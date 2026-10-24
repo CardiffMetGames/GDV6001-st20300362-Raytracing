@@ -305,13 +305,18 @@ void simple_light() {
     world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
 
     auto difflight = make_shared<diffuse_light>(colour(4, 4, 4));
-    world.add(make_shared<triangle>(point3(3, 1, -2), vec3(2, 0, 0), vec3(0, 1, 0), difflight));
+    world.add(make_shared<quad>(point3(3, 1, -2), vec3(2, 0, 0), vec3(0, 1, 0), difflight));
+
+    auto face_texture = make_shared<image_texture>("face.jpg");
+
+	auto sphereMat = make_shared<lambertian>(face_texture);
+	world.add(make_shared<sphere>(point3(-2, 2, 2), 1.5, sphereMat));
 
     camera cam;
 
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 400;
-    cam.samples_per_pixel = 100;
+    cam.image_width = 1200;
+    cam.samples_per_pixel = 1000;
     cam.max_depth = 50;
     cam.background = colour(0, 0, 0);
 
@@ -361,8 +366,8 @@ void cornell_box()
     camera cam;
 
     cam.aspect_ratio = 1.0;
-    cam.image_width = 600;
-    cam.samples_per_pixel = 500;
+    cam.image_width = 1200;
+    cam.samples_per_pixel = 1000;
     cam.max_depth = 50;
     cam.background = colour(0, 0, 0);
 
@@ -421,9 +426,37 @@ void cornell_smoke()
     render(cam, world);
 }
 
+void triangle_scene()
+{
+    hittable_list world;
+
+    auto green = make_shared<lambertian>(colour(0.1, 0.7, 0.3));
+    auto ground = make_shared<lambertian>(colour(0.8, 0.8, 0.8));
+    auto light = make_shared<diffuse_light>(colour(4, 4, 4));
+
+    world.add(make_shared<triangle>(point3(-1, -2, 0), vec3(3, 0, 0), vec3(0, 3, 0), green)); // (Position, u Position, v Position)
+    world.add(make_shared<quad>(point3(-4, -2, 2), vec3(8, 0, 0), vec3(0, 0, -4), ground));
+    world.add(make_shared<quad>(point3(-2, 2, 1), vec3(4, 0, 0), vec3(0, 0, -2), light));
+
+    camera cam;
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 20;
+    cam.background = colour(0.05, 0.08, 0.15);
+
+    cam.vfov = 45;
+    cam.lookfrom = point3(0, 0, 8);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0;
+
+    render(cam, world);
+}
+
 int main()
 {
-    switch (7) 
+    switch (6)
     {
     case 1:  bouncing_spheres();  break;
     case 2:  checkered_spheres(); break;
@@ -433,6 +466,7 @@ int main()
     case 6: simple_light(); break;
     case 7: cornell_box(); break;
     case 8:  cornell_smoke(); break;
+    case 9:  triangle_scene(); break;
     }
 
     return 0;

@@ -2,7 +2,6 @@
 #define TRIANGLE_H
 
 #include "hittable.h"
-#include "hittable_list.h"
 
 class triangle : public hittable 
 {

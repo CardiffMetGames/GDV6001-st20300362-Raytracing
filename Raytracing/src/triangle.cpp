@@ -1,36 +1,43 @@
 #include "triangle.h"
 
-void triangle::set_bounding_box() 
+void triangle::set_bounding_box()
 {
-    // Compute the bounding box of all four vertices.
-    auto bbox_diagonal1 = aabb(Q, Q + u + v);
-    auto bbox_diagonal2 = aabb(Q + u, Q + v);
-    bbox = aabb(bbox_diagonal1, bbox_diagonal2);
+    const auto a = Q;
+    const auto b = Q + u;
+    const auto c = Q + v;
+
+    point3 min_point(
+        std::fmin(a.x(), std::fmin(b.x(), c.x())),
+        std::fmin(a.y(), std::fmin(b.y(), c.y())),
+        std::fmin(a.z(), std::fmin(b.z(), c.z())));
+    point3 max_point(
+        std::fmax(a.x(), std::fmax(b.x(), c.x())),
+        std::fmax(a.y(), std::fmax(b.y(), c.y())),
+        std::fmax(a.z(), std::fmax(b.z(), c.z())));
+
+    bbox = aabb(min_point, max_point);
 }
 
 aabb triangle::bounding_box() const
-{ 
-    return bbox; 
+{
+    return bbox;
 }
 
 bool triangle::hit(const ray& r, interval ray_t, hit_record& rec) const
 {
     auto denom = dot(normal, r.direction());
 
-    // No hit if the ray is parallel to the plane.
     if (std::fabs(denom) < 1e-8)
     {
         return false;
     }
 
-    // Return false if the hit point parameter t is outside the ray interval.
     auto t = (D - dot(normal, r.origin())) / denom;
     if (!ray_t.contains(t))
     {
         return false;
     }
 
-    // Determine if the hit point lies within the planar shape using its plane coordinates.
     auto intersection = r.at(t);
     vec3 planar_hitpt_vector = intersection - Q;
     auto alpha = dot(w, cross(planar_hitpt_vector, v));
@@ -40,9 +47,6 @@ bool triangle::hit(const ray& r, interval ray_t, hit_record& rec) const
     {
         return false;
     }
-
-
-    // Ray hits the 2D shape; set the rest of the hit record and return true.
 
     rec.t = t;
     rec.p = intersection;
@@ -54,11 +58,7 @@ bool triangle::hit(const ray& r, interval ray_t, hit_record& rec) const
 
 bool triangle::is_interior(double a, double b, hit_record& rec) const
 {
-    interval unit_interval = interval(0, 1);
-    // Given the hit point in plane coordinates, return false if it is outside the
-    // primitive, otherwise set the hit record UV coordinates and return true.
-
-    if (!((a < 0 || b > 1) && (a < 0 || a + b > 1)))
+    if (a < 0 || b < 0 || a + b > 1)
     {
         return false;
     }
