@@ -298,7 +298,8 @@ void quads()
     render(cam, world);
 }
 
-void simple_light() {
+void simple_light() 
+{
     hittable_list world;
 
     auto pertext = make_shared<noise_texture>(4);
@@ -310,13 +311,13 @@ void simple_light() {
     auto face_texture = make_shared<image_texture>("face.jpg");
 
 	auto sphereMat = make_shared<lambertian>(face_texture);
-	world.add(make_shared<sphere>(point3(-2, 2, 2), 1.5, sphereMat));
+	world.add(make_shared<sphere>(point3(0, 2, 1), 1.5, sphereMat)); // (Position, u Position, v Position)
 
     camera cam;
 
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 1200;
-    cam.samples_per_pixel = 1000;
+    cam.image_width = 600;
+    cam.samples_per_pixel = 500;
     cam.max_depth = 50;
     cam.background = colour(0, 0, 0);
 
@@ -454,6 +455,16 @@ void triangle_scene()
     render(cam, world);
 }
 
+void scene_test()
+{
+    // Scene Loop. Need game object and light factories
+
+    for (list<hittable*>::iterator it = 5; it != 10; it++)
+    {
+        world.add(it);
+    }
+}
+
 int main()
 {
     switch (6)
@@ -467,6 +478,7 @@ int main()
     case 7: cornell_box(); break;
     case 8:  cornell_smoke(); break;
     case 9:  triangle_scene(); break;
+    case 10: scene_test() break;
     }
 
     return 0;
